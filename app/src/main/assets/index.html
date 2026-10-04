@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Project Superhuman Glance</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#082d66;--blue:#0d63c8;--cyan:#26a6e8;--green:#168a78;
+  --violet:#6547c9;--orange:#d7652b;--ink:#0b1f35;--muted:#64748b;
+  --bg:#f8fafd;--line:#dce5ef;--card:#fff;--danger:#bd3d46
+}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:linear-gradient(180deg,#fdfefe 0%,#f5f8fc 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+body{padding:max(14px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left))}
+button{font:inherit}
+.shell{width:100%;height:100%;max-width:1600px;margin:auto;display:grid;grid-template-rows:auto minmax(0,1fr);gap:14px}
+.topbar{min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 4px}
+.brand{display:flex;align-items:center;gap:12px}
+.mark{width:42px;height:42px;border-radius:14px;background:linear-gradient(145deg,#082d66,#0d63c8);display:grid;place-items:center;color:#fff;font-weight:900;letter-spacing:-.05em;box-shadow:0 8px 20px rgba(8,45,102,.16)}
+.brand-name{font-size:13px;letter-spacing:.13em;font-weight:900;color:var(--navy)}
+.brand-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.top-right{display:flex;align-items:center;gap:10px}
+.sync{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.86);padding:8px 12px;font-size:10px;font-weight:800;color:#50677c}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#60b58e;box-shadow:0 0 0 4px rgba(96,181,142,.11)}
+.clock{text-align:right}.clock b{display:block;font-size:17px;color:#173d5d}.clock span{display:block;font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+
+.dashboard{min-height:0;display:grid;grid-template-columns:1.12fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:12px}
+.card{position:relative;overflow:hidden;border-radius:23px;background:#fff;box-shadow:0 7px 22px rgba(12,46,80,.055);padding:17px;border:1px solid rgba(220,229,239,.55)}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.label{font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#74899b}
+.status-pill{font-size:8px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:5px 8px;background:#e8f5ef;color:#287859}
+.value{font-weight:880;letter-spacing:-.045em}
+.sub{color:var(--muted);font-size:9.5px;line-height:1.38}
+
+.overview{grid-row:1/-1;background:linear-gradient(155deg,#f3f8fd 0%,#fff 62%);padding:19px;display:flex;flex-direction:column}
+.overview-top{display:flex;justify-content:space-between;gap:12px}
+.overview-title h1{font-size:26px;line-height:1.04;margin:7px 0 5px;letter-spacing:-.04em;color:#102f4b}
+.overview-title p{font-size:10px;color:#71869a;margin:0;line-height:1.4}
+.score-zone{flex:1;min-height:0;display:grid;place-items:center;padding:4px 0}
+.score-ring{width:min(24vh,180px);aspect-ratio:1;border-radius:50%;background:conic-gradient(#168a78 0 84%,#e5edf2 84% 100%);position:relative;display:grid;place-items:center;box-shadow:0 13px 30px rgba(27,108,94,.10)}
+.score-ring:after{content:"";position:absolute;inset:11px;border-radius:50%;background:linear-gradient(145deg,#fff,#f8fbfc)}
+.score-inner{position:relative;z-index:2;text-align:center}.score-inner b{font-size:min(7vh,52px);line-height:.9;color:#153a56;letter-spacing:-.07em}.score-inner span{display:block;font-size:8px;margin-top:7px;text-transform:uppercase;letter-spacing:.12em;font-weight:900;color:#7b8fa0}
+.focus{border-left:3px solid var(--green);padding:10px 0 10px 12px}.focus b{font-size:11px;color:#16334e}.focus p{font-size:9px;line-height:1.4;color:#667c91;margin:3px 0 0}
+.micro-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:11px}.micro{background:#f4f8fb;border-radius:13px;padding:9px}.micro span{display:block;font-size:7px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:#8091a1}.micro b{display:block;font-size:13px;color:#173b58;margin-top:3px}
+
+.sleep{background:linear-gradient(155deg,#eef3ff,#fff)}
+.sleep .value{font-size:27px;color:#2c4679;margin-top:10px}.sleep-strip{height:12px;border-radius:999px;background:#e1e8f6;margin:13px 0 5px;overflow:hidden;display:flex}.sleep-strip i{height:100%;display:block}.deep{width:22%;background:#405fa9}.rem{width:25%;background:#7d8fe2}.light{width:46%;background:#9cb6ef}.awake{width:7%;background:#d7dff1}.times{display:flex;justify-content:space-between;font-size:8px;color:#7c8ca9}
+
+.training{background:linear-gradient(145deg,#fff8f4,#fff)}
+.training .value{font-size:20px;color:#6b3b29;margin-top:10px}.week{height:54px;display:flex;align-items:flex-end;gap:7px;margin:11px 0 5px}.day{flex:1;text-align:center}.day i{display:block;max-width:16px;margin:0 auto 4px;border-radius:7px 7px 3px 3px;background:#ead8cf;min-height:5px}.day i.on{background:#cf7048}.day span{font-size:6.5px;font-weight:900;color:#9a877d;text-transform:uppercase}
+
+.nutrition{background:linear-gradient(135deg,#0c4e82,#167bb2);color:#fff;border:0}.nutrition .label{color:rgba(255,255,255,.68)}.nutrition .value{font-size:27px;margin-top:10px}.nutrition .sub{color:rgba(255,255,255,.72)}.macro-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}.macro{background:rgba(255,255,255,.12);border-radius:11px;padding:8px;text-align:center}.macro b{display:block;font-size:11px}.macro span{display:block;font-size:7px;margin-top:2px;color:rgba(255,255,255,.72)}
+
+.hydration{background:linear-gradient(155deg,#e8f7ff 0%,#f8fcff 62%,#fff 100%)}.hydration-body{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:13px;margin-top:10px}.water-ring{width:min(12vh,86px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(#198fd1 0 68%,#dcecf5 68% 100%)}.water-ring:after{content:"";position:absolute;inset:8px;border-radius:50%;background:#f8fcff}.water-ring b{z-index:1;font-size:17px;color:#16476a}.water-copy .value{font-size:23px;color:#123c5d}.water-copy .sub{margin-top:3px}
+
+.bodyclinical{background:linear-gradient(155deg,#f5f2ff,#fff)}.dual{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.dual-box{border-radius:14px;background:rgba(255,255,255,.72);border:1px solid #e6e2f2;padding:10px}.dual-box span{display:block;font-size:7px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:#85819c}.dual-box b{display:block;font-size:17px;color:#35345e;margin-top:4px}.clinical-line{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:9px;color:#6f7991}.clinical-dot{width:8px;height:8px;border-radius:50%;background:#60b58e;box-shadow:0 0 0 4px rgba(96,181,142,.10)}
+
+@media (max-height:650px){
+  body{padding:10px 14px}.shell{gap:9px}.topbar{min-height:44px}.mark{width:36px;height:36px;border-radius:12px}.brand-sub{display:none}
+  .dashboard{gap:9px}.card{padding:13px;border-radius:19px}.overview{padding:14px}.overview-title h1{font-size:21px}.focus{padding-top:7px;padding-bottom:7px}.micro-row{margin-top:7px}
+  .sleep .value,.nutrition .value{font-size:23px}.training .value{font-size:17px}.week{height:42px;margin-top:7px}.macro-row,.dual{margin-top:8px}.hydration-body{margin-top:7px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">S</div>
+      <div><div class="brand-name">PROJECT SUPERHUMAN</div><div class="brand-sub">Glance · your whole day, one screen</div></div>
+    </div>
+    <div class="top-right">
+      <div class="sync"><span class="sync-dot"></span><span id="syncText">Demo data · phone sync next</span></div>
+      <div class="clock"><b id="clock">--:--</b><span id="date">---</span></div>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <section class="card overview">
+      <div class="overview-top">
+        <div class="overview-title"><div class="label">Today</div><h1>Good afternoon, Jakub.</h1><p>Your current state is balanced. Training readiness is good.</p></div>
+        <div class="status-pill">Stable</div>
+      </div>
+      <div class="score-zone"><div class="score-ring" id="scoreRing"><div class="score-inner"><b id="score">84</b><span>Daily state</span></div></div></div>
+      <div class="focus"><b id="focusTitle">Today’s focus · easy aerobic work</b><p id="focusText">Recovery is solid. Keep the run controlled and prioritise a calm evening.</p></div>
+      <div class="micro-row">
+        <div class="micro"><span>Resting HR</span><b id="rhr">54</b></div>
+        <div class="micro"><span>Steps</span><b id="steps">6,842</b></div>
+        <div class="micro"><span>Weight</span><b id="weight">78.8 kg</b></div>
+      </div>
+    </section>
+
+    <section class="card sleep">
+      <div class="card-head"><div class="label">Sleep</div><div class="status-pill">Good</div></div>
+      <div class="value" id="sleepDuration">7h 48m</div><div class="sub" id="sleepScore">Sleep score 87 · efficiency 92%</div>
+      <div class="sleep-strip"><i class="deep"></i><i class="rem"></i><i class="light"></i><i class="awake"></i></div>
+      <div class="times"><span>23:34</span><span>07:22</span></div>
+    </section>
+
+    <section class="card training">
+      <div class="card-head"><div class="label">Training</div><div class="status-pill" style="background:#fff0e9;color:#a95b37">Ready</div></div>
+      <div class="value" id="training">Zone 2 Run</div><div class="sub" id="trainingSub">3 × 700 m · controlled pace</div>
+      <div class="week">
+        <div class="day"><i class="on" style="height:32px"></i><span>M</span></div><div class="day"><i class="on" style="height:44px"></i><span>T</span></div>
+        <div class="day"><i style="height:8px"></i><span>W</span></div><div class="day"><i class="on" style="height:38px"></i><span>T</span></div>
+        <div class="day"><i class="on" style="height:28px"></i><span>F</span></div><div class="day"><i style="height:8px"></i><span>S</span></div><div class="day"><i class="on" style="height:20px"></i><span>S</span></div>
+      </div>
+    </section>
+
+    <section class="card nutrition">
+      <div class="card-head"><div class="label">Nutrition</div><div style="font-size:15px;color:rgba(255,255,255,.7)">›</div></div>
+      <div class="value"><span id="calories">1,240</span> <span style="font-size:11px;font-weight:700;letter-spacing:0">kcal</span></div>
+      <div class="sub">of <span id="calorieTarget">1,900</span> kcal today</div>
+      <div class="macro-row"><div class="macro"><b id="protein">142 g</b><span>Protein</span></div><div class="macro"><b id="carbs">96 g</b><span>Carbs</span></div><div class="macro"><b id="fat">43 g</b><span>Fat</span></div></div>
+    </section>
+
+    <section class="card hydration">
+      <div class="card-head"><div class="label">Hydration</div><div style="font-size:15px;color:#8aa1b4">›</div></div>
+      <div class="hydration-body"><div class="water-ring" id="waterRing"><b id="waterPct">68%</b></div><div class="water-copy"><div class="value" id="water">2.4 L</div><div class="sub">of 3.5 L target<br>1.1 L remaining</div></div></div>
+    </section>
+
+    <section class="card bodyclinical">
+      <div class="card-head"><div class="label">Body + Clinical</div><div class="status-pill">Normal</div></div>
+      <div class="dual"><div class="dual-box"><span>Weight</span><b id="bodyWeight">78.8</b></div><div class="dual-box"><span>BMI</span><b id="bmi">22.8</b></div></div>
+      <div class="clinical-line"><span class="clinical-dot"></span><span id="clinical">No active clinical flags</span></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  function pad(n){return String(n).padStart(2,'0')}
+  function tick(){
+    const d=new Date();
+    document.getElementById('clock').textContent=pad(d.getHours())+':'+pad(d.getMinutes());
+    document.getElementById('date').textContent=d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'});
+  }
+  tick(); setInterval(tick,10000);
+
+  function set(id,v){if(v!==undefined&&v!==null){const el=document.getElementById(id);if(el)el.textContent=v}}
+  window.SuperhumanGlance={
+    update:function(s){
+      s=s||{};
+      set('score',s.score);
+      if(s.score!=null)document.getElementById('scoreRing').style.background='conic-gradient(#168a78 0 '+Math.max(0,Math.min(100,s.score))+'%,#e5edf2 '+Math.max(0,Math.min(100,s.score))+'% 100%)';
+      set('rhr',s.restingHR); set('steps',s.steps); set('weight',s.weight); set('bodyWeight',s.bodyWeight||s.weight);
+      set('sleepDuration',s.sleepDuration); set('sleepScore',s.sleepSummary);
+      set('training',s.training); set('trainingSub',s.trainingSummary);
+      set('calories',s.calories); set('calorieTarget',s.calorieTarget); set('protein',s.protein); set('carbs',s.carbs); set('fat',s.fat);
+      set('water',s.water); set('waterPct',s.waterPct!=null?s.waterPct+'%':null);
+      if(s.waterPct!=null){const p=Math.max(0,Math.min(100,s.waterPct));document.getElementById('waterRing').style.background='conic-gradient(#198fd1 0 '+p+'%,#dcecf5 '+p+'% 100%)'}
+      set('bmi',s.bmi); set('clinical',s.clinical); set('focusTitle',s.focusTitle); set('focusText',s.focusText);
+      if(s.synced){document.getElementById('syncText').textContent='Synced with Project Superhuman'}
+    }
+  };
+})();
+</script>
+</body>
+</html>

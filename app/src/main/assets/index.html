@@ -21,8 +21,11 @@ button{font:inherit}
 .brand-name{font-size:13px;letter-spacing:.13em;font-weight:900;color:var(--navy)}
 .brand-sub{font-size:11px;color:var(--muted);margin-top:3px}
 .top-right{display:flex;align-items:center;gap:10px}
-.sync{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.86);padding:8px 12px;font-size:10px;font-weight:800;color:#50677c}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:#60b58e;box-shadow:0 0 0 4px rgba(96,181,142,.11)}
+.sync{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.86);padding:8px 12px;font-size:10px;font-weight:800;color:#50677c;cursor:pointer;user-select:none}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#aab7c3;box-shadow:0 0 0 4px rgba(120,140,160,.10);transition:.18s}
+.sync.synced .sync-dot{background:#60b58e;box-shadow:0 0 0 4px rgba(96,181,142,.11)}
+.sync.connecting .sync-dot{background:#d9a34a;box-shadow:0 0 0 4px rgba(217,163,74,.12)}
+.sync.error .sync-dot{background:#c76565;box-shadow:0 0 0 4px rgba(199,101,101,.11)}
 .clock{text-align:right}.clock b{display:block;font-size:17px;color:#173d5d}.clock span{display:block;font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
 
 .dashboard{min-height:0;display:grid;grid-template-columns:1.12fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:12px}
@@ -56,6 +59,17 @@ button{font:inherit}
 
 .bodyclinical{background:linear-gradient(155deg,#f5f2ff,#fff)}.dual{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.dual-box{border-radius:14px;background:rgba(255,255,255,.72);border:1px solid #e6e2f2;padding:10px}.dual-box span{display:block;font-size:7px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:#85819c}.dual-box b{display:block;font-size:17px;color:#35345e;margin-top:4px}.clinical-line{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:9px;color:#6f7991}.clinical-dot{width:8px;height:8px;border-radius:50%;background:#60b58e;box-shadow:0 0 0 4px rgba(96,181,142,.10)}
 
+.pair-backdrop{position:fixed;inset:0;z-index:50;background:rgba(8,30,52,.26);backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:22px}
+.pair-backdrop.open{display:flex}
+.pair-card{width:min(460px,92vw);border-radius:24px;background:#fff;border:1px solid var(--line);box-shadow:0 22px 70px rgba(8,45,102,.24);padding:20px}
+.pair-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.pair-head h2{font-size:20px;margin:3px 0 4px;color:#173a59}.pair-head p{font-size:10px;line-height:1.45;color:var(--muted);margin:0}
+.pair-close{width:34px;height:34px;border:0;border-radius:11px;background:#eef3f7;color:#4e667b;font-weight:900}
+.pair-field{display:block;margin-top:14px}.pair-field span{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.1em;font-weight:900;color:#7b8ea0;margin:0 0 5px 2px}
+.pair-field input{width:100%;height:43px;border:1px solid #d9e4ed;border-radius:13px;background:#fbfcfe;padding:0 11px;color:#173650;outline:none;font-size:12px}
+.pair-field input:focus{border-color:#89b6e3;box-shadow:0 0 0 3px rgba(13,99,200,.07)}
+.pair-actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:14px}.pair-save,.pair-clear{height:43px;border-radius:13px;font-size:11px;font-weight:850}.pair-save{border:0;background:var(--blue);color:#fff}.pair-clear{border:1px solid #e2e8ef;background:#f7f9fb;color:#708295;padding:0 14px}
+.pair-note{font-size:9px;line-height:1.45;color:#8190a0;margin-top:10px}
+
 @media (max-height:650px){
   body{padding:10px 14px}.shell{gap:9px}.topbar{min-height:44px}.mark{width:36px;height:36px;border-radius:12px}.brand-sub{display:none}
   .dashboard{gap:9px}.card{padding:13px;border-radius:19px}.overview{padding:14px}.overview-title h1{font-size:21px}.focus{padding-top:7px;padding-bottom:7px}.micro-row{margin-top:7px}
@@ -71,7 +85,7 @@ button{font:inherit}
       <div><div class="brand-name">PROJECT SUPERHUMAN</div><div class="brand-sub">Glance · your whole day, one screen</div></div>
     </div>
     <div class="top-right">
-      <div class="sync"><span class="sync-dot"></span><span id="syncText">Demo data · phone sync next</span></div>
+      <div class="sync" id="syncControl" role="button" aria-label="Configure Project Superhuman connection"><span class="sync-dot"></span><span id="syncText">Not connected · tap to pair</span></div>
       <div class="clock"><b id="clock">--:--</b><span id="date">---</span></div>
     </div>
   </header>
@@ -128,6 +142,19 @@ button{font:inherit}
   </main>
 </div>
 
+<div class="pair-backdrop" id="pairBackdrop">
+  <div class="pair-card">
+    <div class="pair-head">
+      <div><div class="label">Glance connection</div><h2>Connect to Project Superhuman</h2><p>Enter the local address shown by the phone app and its pairing token. These stay on this tablet.</p></div>
+      <button class="pair-close" id="pairClose">×</button>
+    </div>
+    <label class="pair-field"><span>Phone address</span><input id="pairHost" inputmode="url" placeholder="192.168.1.25:8765"></label>
+    <label class="pair-field"><span>Pairing token</span><input id="pairToken" autocomplete="off" placeholder="Paste token from Project Superhuman"></label>
+    <div class="pair-actions"><button class="pair-save" id="pairSave">Save & connect</button><button class="pair-clear" id="pairClear">Forget</button></div>
+    <div class="pair-note">Glance expects <b>/api/v1/glance</b> on the phone. When the phone-side feature is added, no Glance UI changes should be required.</div>
+  </div>
+</div>
+
 <script>
 (function(){
   function pad(n){return String(n).padStart(2,'0')}
@@ -151,9 +178,62 @@ button{font:inherit}
       set('water',s.water); set('waterPct',s.waterPct!=null?s.waterPct+'%':null);
       if(s.waterPct!=null){const p=Math.max(0,Math.min(100,s.waterPct));document.getElementById('waterRing').style.background='conic-gradient(#198fd1 0 '+p+'%,#dcecf5 '+p+'% 100%)'}
       set('bmi',s.bmi); set('clinical',s.clinical); set('focusTitle',s.focusTitle); set('focusText',s.focusText);
-      if(s.synced){document.getElementById('syncText').textContent='Synced with Project Superhuman'}
     }
   };
+
+  const syncControl=document.getElementById('syncControl');
+  const pairBackdrop=document.getElementById('pairBackdrop');
+  const pairHost=document.getElementById('pairHost');
+  const pairToken=document.getElementById('pairToken');
+
+  function syncState(code,message){
+    syncControl.classList.remove('synced','connecting','error');
+    if(code==='synced')syncControl.classList.add('synced');
+    else if(code==='connecting'||code==='configured')syncControl.classList.add('connecting');
+    else if(code==='offline'||code==='auth_error')syncControl.classList.add('error');
+    document.getElementById('syncText').textContent=message||'Not connected · tap to pair';
+  }
+  function openPair(){
+    try{
+      if(window.SuperhumanSync){
+        const cfg=JSON.parse(SuperhumanSync.getConfig()||'{}');
+        pairHost.value=cfg.host||'';
+      }
+    }catch(e){}
+    pairToken.value='';
+    pairBackdrop.classList.add('open');
+  }
+  function closePair(){pairBackdrop.classList.remove('open')}
+
+  syncControl.addEventListener('click',openPair);
+  document.getElementById('pairClose').addEventListener('click',closePair);
+  pairBackdrop.addEventListener('click',function(e){if(e.target===pairBackdrop)closePair()});
+  document.getElementById('pairSave').addEventListener('click',function(){
+    const host=pairHost.value.trim(),token=pairToken.value.trim();
+    if(!host||!token){syncState('auth_error','Address + token required');return}
+    if(window.SuperhumanSync){SuperhumanSync.configure(host,token);closePair()}
+  });
+  document.getElementById('pairClear').addEventListener('click',function(){
+    if(window.SuperhumanSync)SuperhumanSync.clearConfiguration();
+    pairHost.value='';pairToken.value='';closePair();
+  });
+
+  window.ProjectSuperhumanSync={
+    onSnapshot:function(raw){
+      try{window.SuperhumanGlance.update(JSON.parse(raw));}catch(e){syncState('offline','Invalid data from phone')}
+    },
+    onStatus:function(raw){
+      try{const s=JSON.parse(raw);syncState(s.code,s.message);}catch(e){}
+    }
+  };
+
+  try{
+    if(window.SuperhumanSync){
+      const cfg=JSON.parse(SuperhumanSync.getConfig()||'{}');
+      if(cfg.host&&cfg.paired)syncState('connecting','Connecting to Project Superhuman…');
+      else syncState('unpaired','Not connected · tap to pair');
+    }
+  }catch(e){}
 })();
 </script>
 </body>
